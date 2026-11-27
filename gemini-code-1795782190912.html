@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Market Dashboard</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      line-height: 1.5;
+      padding: 16px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .title-group h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .clock {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+    .header-center {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .market-badges {
+      display: flex;
+      gap: 8px;
+    }
+    .badge {
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #6e7681;
+    }
+    .dot.open { background: #3fb950; box-shadow: 0 0 6px #3fb950; }
+    .dot.ext { background: #d29922; }
+    .search-box {
+      display: flex;
+      gap: 6px;
+    }
+    .search-box input {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      width: 185px;
+      outline: none;
+    }
+    .search-box input:focus { border-color: var(--accent); }
+    .search-box button {
+      background: var(--accent);
+      color: #0d1117;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .search-box button:hover { opacity: 0.9; }
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .quick-links a {
+      text-decoration: none;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 6px 11px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .quick-links a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    /* 메모장 영역 */
+    .memo-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+    .memo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .memo-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .memo-status {
+      font-size: 0.75rem;
+      color: #3fb950;
+    }
+    .memo-clear {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .memo-clear:hover {
+      border-color: #f85149;
+      color: #f85149;
+    }
+    .memo-textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      padding: 8px 10px;
+      resize: vertical;
+      outline: none;
+    }
+    .memo-textarea:focus {
+      border-color: var(--accent);
+    }
+    .section-title {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin: 18px 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .ticker-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .grid-6 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      min-height: 220px;
+    }
+    .card.tall {
+      height: 540px;
+    }
+    @media (max-width: 1024px) {
+      .grid-6 { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      body { padding: 10px; }
+      .grid-6 { grid-template-columns: 1fr; }
+      .search-box input { width: 150px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 상단 헤더 -->
+    <header>
+      <div class="title-group">
+        <h1>📊 Market Dashboard</h1>
+        <div class="clock" id="clock">00:00:00</div>
+      </div>
+
+      <!-- 가운데: 증시 개장 상태 + 트레이딩뷰 검색창 -->
+      <div class="header-center">
+        <div class="market-badges">
+          <div class="badge"><span class="dot" id="kr-dot"></span><span id="kr-status">한국장 확인중</span></div>
+          <div class="badge"><span class="dot" id="us-dot"></span><span id="us-status">미국장 확인중</span></div>
+        </div>
+        <form class="search-box" onsubmit="searchTicker(event)">
+          <input type="text" id="ticker-input" placeholder="티커 검색 (예: NVDA, 005930)" autocomplete="off" />
+          <button type="submit">차트</button>
+        </form>
+      </div>
+
+      <nav class="quick-links">
+        <a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener">공포·탐욕 지수</a>
+        <a href="https://www.ig.com/en/indices/markets-indices/weekend-us-tech-100-e1" target="_blank" rel="noopener">주말 나스닥</a>
+        <a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" rel="noopener">FedWatch</a>
+        <a href="https://finviz.com/map.ashx" target="_blank" rel="noopener">Finviz 히트맵</a>
+      </nav>
+    </header>
+
+    <!-- 3줄 메모장 (브라우저 자동 저장) -->
+    <div class="memo-box">
+      <div class="memo-header">
+        <span>📝 Quick Memo (이 기기 브라우저에 자동 저장)</span>
+        <div class="memo-actions">
+          <span class="memo-status" id="memo-status"></span>
+          <button type="button" class="memo-clear" onclick="clearMemo()">지우기</button>
+        </div>
+      </div>
+      <textarea
+        id="quick-memo"
+        class="memo-textarea"
+        rows="3"
+        placeholder="매매 원칙, 오늘 체크할 지표, 관심 종목 가격대 등을 자유롭게 적어두세요..."
+      ></textarea>
+    </div>
+
+    <!-- 1. 상단 실시간 티커 -->
+    <div class="ticker-wrap">
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+        {
+          "symbols": [
+            { "proName": "FOREXCOM:NSXUSD", "title": "나스닥 100" },
+            { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
+            { "proName": "KRX:KOSPI", "title": "코스피" },
+            { "proName": "FX_IDC:USDKRW", "title": "원/달러" },
+            { "proName": "TVC:US10Y", "title": "미 국채 10년" },
+            { "proName": "TVC:VIX", "title": "VIX" },
+            { "proName": "TVC:USOIL", "title": "WTI 유가" },
+            { "proName": "TVC:GOLD", "title": "금" }
+          ],
+          "showSymbolLogo": true,
+          "isTransparent": true,
+          "displayMode": "adaptive",
+          "colorTheme": "dark",
+          "locale": "kr"
+        }
+        </script>
+      </div>
+    </div>
+
+    <!-- 2. 핵심 매크로 6종 미니 차트 -->
+    <div class="section-title">Core Macro Charts</div>
+    <div class="grid-6">
+      <div class="card">
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {
+            "symbol": "FOREXCOM:NSXUSD",
+            "width": "100%",
+            "height": 220,
+            "locale": "kr",
+            "dateRange": "1M",
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "autosize": false
+          }
+          </script>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {
+            "symbol": "TVC:US10Y",
+            "width": "100%",
+            "height": 220,
+            "locale": "kr",
+            "dateRange": "1M",
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "autosize": false
+          }
+          </script>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {
+            "symbol": "FX_IDC:USDKRW",
+            "width": "100%",
+            "height": 220,
+            "locale": "kr",
+            "dateRange": "1M",
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "autosize": false
+          }
+          </script>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {
+            "symbol": "TVC:VIX",
+            "width": "100%",
+            "height": 220,
+            "locale": "kr",
+            "dateRange": "1M",
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "autosize": false
+          }
+          </script>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {
+            "symbol": "TVC:USOIL",
+            "width": "100%",
+            "height": 220,
+            "locale": "kr",
+            "dateRange": "1M",
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "autosize": false
+          }
+          </script>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {
+            "symbol": "KRX:KOSPI",
+            "width": "100%",
+            "height": 220,
+            "locale": "kr",
+            "dateRange": "1M",
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "autosize": false
+          }
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 하단: 관심 종목/지수 탭 + 경제 캘린더 -->
+    <div class="section-title">Watchlist & Economic Calendar</div>
+    <div class="grid-2">
+      <div class="card tall">
+        <div class="tradingview-widget-container" style="height: 100%; width: 100%;">
+          <div class="tradingview-widget-container__widget" style="height: 100%; width: 100%;"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+          {
+            "colorTheme": "dark",
+            "dateRange": "1M",
+            "showChart": true,
+            "locale": "kr",
+            "width": "100%",
+            "height": "100%",
+            "isTransparent": true,
+            "showSymbolLogo": true,
+            "tabs": [
+              {
+                "title": "주요 ETF · 종목",
+                "symbols": [
+                  { "s": "NASDAQ:QQQM", "d": "QQQM" },
+                  { "s": "NYSE:BRK.B", "d": "버크셔 해서웨이 B" },
+                  { "s": "AMEX:IAUM", "d": "IAUM (금 ETF)" },
+                  { "s": "NASDAQ:TLT", "d": "TLT (미 20년 국채)" },
+                  { "s": "NASDAQ:NVDA", "d": "엔비디아" },
+                  { "s": "NASDAQ:MSFT", "d": "마이크로소프트" }
+                ]
+              },
+              {
+                "title": "국내 대표",
+                "symbols": [
+                  { "s": "KRX:KOSPI", "d": "코스피" },
+                  { "s": "KRX:KOSDAQ", "d": "코스닥" },
+                  { "s": "KRX:005930", "d": "삼성전자" },
+                  { "s": "KRX:000660", "d": "SK하이닉스" }
+                ]
+              },
+              {
+                "title": "원자재 · 환율",
+                "symbols": [
+                  { "s": "TVC:DXY", "d": "달러 인덱스" },
+                  { "s": "FX_IDC:USDKRW", "d": "원/달러" },
+                  { "s": "FX_IDC:JPYKRW", "d": "원/엔" },
+                  { "s": "TVC:USOIL", "d": "WTI 유가" },
+                  { "s": "TVC:GOLD", "d": "금 현물" }
+                ]
+              }
+            ]
+          }
+          </script>
+        </div>
+      </div>
+
+      <div class="card tall">
+        <div class="tradingview-widget-container" style="height: 100%; width: 100%;">
+          <div class="tradingview-widget-container__widget" style="height: 100%; width: 100%;"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+          {
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "width": "100%",
+            "height": "100%",
+            "locale": "kr",
+            "importanceFilter": "0,1",
+            "countryFilter": "us,kr"
+          }
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. 초 단위 실시간 시계 및 한·미 증시 개장 상태
+    function getTimeParts(timeZone) {
+      const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone,
+        month: "2-digit", day: "2-digit",
+        weekday: "short", hour: "2-digit", minute: "2-digit", second: "2-digit",
+        hour12: false
+      });
+      const parts = {};
+      formatter.formatToParts(new Date()).forEach(p => { parts[p.type] = p.value; });
+      return parts;
+    }
+
+    function updateClockAndStatus() {
+      const kst = getTimeParts("Asia/Seoul");
+      const est = getTimeParts("America/New_York");
+
+      const clockEl = document.getElementById("clock");
+      if (clockEl) {
+        clockEl.textContent =
+          `서울 ${kst.month}/${kst.day} ${kst.hour}:${kst.minute}:${kst.second}  |  ` +
+          `뉴욕 ${est.month}/${est.day} ${est.hour}:${est.minute}:${est.second}`;
+      }
+
+      // 한국장 (평일 09:00 ~ 15:30)
+      const krMin = parseInt(kst.hour, 10) * 60 + parseInt(kst.minute, 10
